@@ -32,9 +32,42 @@ environment = SubResource("Environment_gyc6d")
 [node name="Node3D" type="Node3D" parent="." unique_id=1475247224]
 
 [node name="Player" parent="Node3D" unique_id=1662430914 instance=ExtResource("1_djsbo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0418061, -3.311626)
+transform = Transform3D(-2, 0, -1.7484555e-07, 0, 2, 0, 1.7484555e-07, 0, -2, 0, 0.0418061, -3.311626)
+
+[node name="GeneralSkeleton" parent="Node3D/Player/Model/Armature" parent_id_path=PackedInt32Array(1662430914, 1349420275) index="0" unique_id=2076909921]
+bones/0/position = Vector3(-0.0035622255, 0.99215925, 0.035039667)
+bones/0/rotation = Quaternion(-0.035292324, -0.044328693, -0.025299609, 0.99807286)
+bones/1/rotation = Quaternion(0.024987608, 0.014728501, 0.025548302, 0.99925274)
+bones/2/rotation = Quaternion(0.009242585, 0.003717558, 0.01426959, 0.99984854)
+bones/3/rotation = Quaternion(0.008605977, 0.0038325507, 0.014283363, 0.9998537)
+bones/4/rotation = Quaternion(0.045363706, -0.0019643956, 0.0054766107, 0.99895364)
+bones/5/rotation = Quaternion(-0.06503897, 0.010892586, -0.0024499085, 0.99782026)
+bones/7/rotation = Quaternion(0.47720194, -0.478441, -0.6331254, -0.37752452)
+bones/8/rotation = Quaternion(-0.15167455, 0.8282846, -0.4943674, 0.21573196)
+bones/9/rotation = Quaternion(0.040591296, 0.70594084, -0.040591326, 0.7059406)
+bones/10/rotation = Quaternion(0.041758966, -0.57204056, 0.035865396, 0.8183761)
+bones/31/rotation = Quaternion(0.45848408, 0.5002344, 0.6272577, -0.38223755)
+bones/32/rotation = Quaternion(0.12365253, 0.79772604, -0.57653075, -0.12631516)
+bones/33/rotation = Quaternion(0.009680188, -0.70704067, 0.009680215, 0.7070404)
+bones/34/rotation = Quaternion(0.055361174, 0.48224914, -0.021113375, 0.87402815)
+bones/55/rotation = Quaternion(-0.09365785, -0.010595726, 0.9952382, -0.024838518)
+bones/56/rotation = Quaternion(0.03416694, 0.99369377, -0.06713996, -0.08305198)
+bones/57/rotation = Quaternion(0.01057534, 0.6795207, -0.73299104, -0.029389624)
+bones/58/rotation = Quaternion(-2.8234941e-08, 0.9981734, 0.060415145, 2.3054703e-09)
+bones/60/rotation = Quaternion(0.13501628, 0.06755977, 0.9858777, -0.072468445)
+bones/61/rotation = Quaternion(-0.0386403, 0.9946155, -0.0952671, 0.013085266)
+bones/62/rotation = Quaternion(-0.04145562, 0.7159022, -0.69525355, 0.04886708)
+
+[node name="JumpButton" parent="Node3D/Player/CanvasLayer/Control" parent_id_path=PackedInt32Array(1662430914, 2109077509) index="0" unique_id=2043981977]
+position = Vector2(2854, -133.99994)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2077557319]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=2044868596]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Control" type="Control" parent="." unique_id=1063523584]
 layout_mode = 3
@@ -51,3 +84,5 @@ shadow_enabled = true
 transform = Transform3D(1.4, 0, 0, 0, 1.2, 0, 0, 0, 1, 0.417881, -3.403454, -7.8851337)
 material_override = SubResource("StandardMaterial3D_gyc6d")
 mesh = SubResource("QuadMesh_g7b7a")
+
+[editable path="Node3D/Player"]
