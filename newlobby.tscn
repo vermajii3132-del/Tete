@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://i7mltq17fo75"]
+
+[ext_resource type="PackedScene" uid="uid://mpcr7cs74l47" path="res://assets/players/player.tscn" id="1_djsbo"]
+[ext_resource type="Texture2D" uid="uid://okmyf3ot201s" path="res://image_38803b04.png" id="2_sriac"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hqkgv"]
+sky_top_color = Color(0.16719359, 0.4766242, 0.6690043, 1)
+sky_horizon_color = Color(0.6238562, 0.68561965, 0.48854458, 1)
+
+[sub_resource type="Sky" id="Sky_6qx4q"]
+sky_material = SubResource("ProceduralSkyMaterial_hqkgv")
+
+[sub_resource type="Environment" id="Environment_gyc6d"]
+background_mode = 2
+sky = SubResource("Sky_6qx4q")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gyc6d"]
+cull_mode = 2
+shading_mode = 0
+albedo_texture = ExtResource("2_sriac")
+
+[sub_resource type="QuadMesh" id="QuadMesh_g7b7a"]
+size = Vector2(18, 16)
+
+[node name="newlobby" type="Node3D" unique_id=1025665046]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2002709060]
+environment = SubResource("Environment_gyc6d")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1556521451]
+
+[node name="Node3D" type="Node3D" parent="." unique_id=1475247224]
+
+[node name="Player" parent="Node3D" unique_id=1662430914 instance=ExtResource("1_djsbo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0418061, -3.311626)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2077557319]
+
+[node name="Control" type="Control" parent="." unique_id=1063523584]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=897786174]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, -50, 0)
+light_energy = 2.6
+shadow_enabled = true
+
+[node name="background" type="MeshInstance3D" parent="." unique_id=1788495331]
+transform = Transform3D(1.4, 0, 0, 0, 1.2, 0, 0, 0, 1, 0.417881, -3.403454, -7.8851337)
+material_override = SubResource("StandardMaterial3D_gyc6d")
+mesh = SubResource("QuadMesh_g7b7a")
