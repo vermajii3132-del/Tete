@@ -15,8 +15,11 @@ var mouseSensibility : float = 250.0   # ← ye naya line add karo (value badha/
 
 # ===== TPP/FPP CAMERAS =====
 @onready var camera_tpp = $Head/Camera3d as Camera3D
-@onready var camera_fpp = $Head/Camera3D_FPP as Camera3D
+@onready var camera_fpp = $Camera3D_TPP/SpringArm3D/Camera3D
 @onready var view_toggle_btn = $CanvasLayer/ViewToggleBtn as Button
+
+# Extra: SpringArm ko bhi reference le lo (rotation ke liye)
+@onready var spring_arm = $Camera3D_TPP/SpringArm3D as SpringArm3D
 
 var is_fpp := false  # false = TPP, true = FPP
 
@@ -80,6 +83,7 @@ func _ready():
 #	view_toggle_btn.text = "TPP"
 	if not is_multiplayer_authority() and Globals.GameMode != Globals.GameModes.practice: 
 		canvas_layer.hide()
+		model.show()
 		return
 
 	if str(name).to_int() != 1:
@@ -92,6 +96,7 @@ func _ready():
 	# Default: TPP camera ON
 	camera_tpp.current = true
 	camera_fpp.current = false
+	model.show()
 	# ===== VIEW TOGGLE BUTTON SIGNAL =====
 	if view_toggle_btn:
 		view_toggle_btn.pressed.connect(_on_view_toggle_pressed)
@@ -170,11 +175,13 @@ func _input(event):
 			cam.rotation.x -= event.relative.y / mouseSensibility
 			cam.rotation.x = clamp(cam.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
+
 	if not held_object and Input.is_action_just_pressed("Shoot") and not paused:
 		shoot()
 
 	if Input.is_action_just_pressed("Ability1") and not paused:
 		flashlight.visible = !flashlight.visible
+	
 
 @rpc("any_peer")
 func take_damage(damage_in:int):
