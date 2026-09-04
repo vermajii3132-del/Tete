@@ -14,11 +14,9 @@ var mouseSensibility : float = 250.0   # ← ye naya line add karo (value badha/
 @onready var canvas_layer = $CanvasLayer
 
 # ===== TPP/FPP CAMERAS =====
-@onready var camera_tpp = $Head/Camera3d as Camera3D
-@onready var camera_fpp = $Camera3D_TPP/SpringArm3D/Camera3D
+@onready var camera_tpp = $Camera3D_TPP/SpringArm3D/Camera3D as Camera3D   # asli TPP
+@onready var camera_fpp = $Head/Camera3d as Camera3D                       # FPP
 @onready var view_toggle_btn = $CanvasLayer/ViewToggleBtn as Button
-
-# Extra: SpringArm ko bhi reference le lo (rotation ke liye)
 @onready var spring_arm = $Camera3D_TPP/SpringArm3D as SpringArm3D
 
 var is_fpp := false  # false = TPP, true = FPP
@@ -44,10 +42,10 @@ var speed
 var paused : bool
 var mouse_locked = false
 
-const WALK_SPEED = 3.0
+const WALK_SPEED = 5.0
 const SPRINT_SPEED = 5.0
 const CROUCH_SPEED = 2.0
-const JUMP_VELOCITY = 4.8
+const JUMP_VELOCITY = 5.2
 const ACCELERATION = 100
 
 const SENSITIVITY = 0.004
@@ -93,10 +91,13 @@ func _ready():
 	gunRay.add_exception(self)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+
 	# Default: TPP camera ON
+	is_fpp = false
 	camera_tpp.current = true
 	camera_fpp.current = false
 	model.show()
+	model.rotation.y = deg_to_rad(180)   # agar character peeche dekh raha ho to
 	# ===== VIEW TOGGLE BUTTON SIGNAL =====
 	if view_toggle_btn:
 		view_toggle_btn.pressed.connect(_on_view_toggle_pressed)
@@ -129,6 +130,15 @@ func _physics_process(delta):
 		velocity.z = move_toward(velocity.z, 0, speed)
 
 	move_and_slide()
+	_update_animations(delta)
+	# _physics_process mein
+	if Input.is_action_pressed("Crouch") and is_on_floor():
+			speed = CROUCH_SPEED
+				# height change (optional)
+					# env_colision.shape.height = PLAYER_CROUCH_HEIGHT
+	#else:
+						# env_colision.shape.height = PLAYER_HEIGHT
+
 
 func _headbob(time) -> Vector3:
 	var pos = camera_tpp.position
@@ -156,26 +166,33 @@ func _on_view_toggle_pressed():
 		print("Switched to TPP")
 
 func _input(event):
-	# Mobile camera rotation
+	# Mobile
 	if event is InputEventScreenDrag:
 		rotate_y(deg_to_rad(-event.relative.x * touch_sensitivity))
-		var cam = camera_tpp if not is_fpp else camera_fpp
-		cam.rotate_x(deg_to_rad(-event.relative.y * touch_sensitivity))
-		cam.rotation.x = clamp(cam.rotation.x, deg_to_rad(-89), deg_to_rad(89))
+		
+		if is_fpp:
+			camera_fpp.rotate_x(deg_to_rad(-event.relative.y * touch_sensitivity))
+			camera_fpp.rotation.x = clamp(camera_fpp.rotation.x, deg_to_rad(-89), deg_to_rad(89))
+		else:
+			spring_arm.rotate_x(deg_to_rad(-event.relative.y * touch_sensitivity))
+			spring_arm.rotation.x = clamp(spring_arm.rotation.x, deg_to_rad(-55), deg_to_rad(25))
 		return
 
 	if not is_multiplayer_authority(): 
 		return
 
-	# PC Mouse controls
+	# PC Mouse
 	if event is InputEventMouseMotion and not mouse_locked:
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			rotation.y -= event.relative.x / mouseSensibility
-			var cam = camera_tpp if not is_fpp else camera_fpp
-			cam.rotation.x -= event.relative.y / mouseSensibility
-			cam.rotation.x = clamp(cam.rotation.x, deg_to_rad(-90), deg_to_rad(90))
-
-
+			
+			if is_fpp:
+				camera_fpp.rotation.x -= event.relative.y / mouseSensibility
+				camera_fpp.rotation.x = clamp(camera_fpp.rotation.x, deg_to_rad(-89), deg_to_rad(89))
+			else:
+				spring_arm.rotation.x -= event.relative.y / mouseSensibility
+				spring_arm.rotation.x = clamp(spring_arm.rotation.x, deg_to_rad(-55), deg_to_rad(25))
+				
 	if not held_object and Input.is_action_just_pressed("Shoot") and not paused:
 		shoot()
 
@@ -225,6 +242,51 @@ func hold_object():
 		var distance_from_player_and_object = held_object.global_position.distance_to(global_transform.origin)
 		if distance_from_player_and_object > 2:
 			drop_object.rpc()
+
+func _update_animations(delta):
+	if not animation_tree:
+		return
+
+	# ----- Horizontal Movement -----
+	var horizontal_vel = Vector3(velocity.x, 0, velocity.z)
+	var speed = horizontal_vel.length()
+
+	var blend_pos = Vector2.ZERO
+
+	if speed > 0.15:
+		# Local direction nikalna (character ke hisaab se)
+		var local_dir = global_transform.basis.inverse() * horizontal_vel.normalized()
+		
+		# Y = Forward/Back , X = Left/Right
+		blend_pos.x = local_dir.x
+		blend_pos.y = -local_dir.z   # Godot mein forward usually -Z hota hai
+
+		# Speed ke hisaab se intensity
+		if speed > WALK_SPEED + 0.5:
+			blend_pos = blend_pos.normalized() * 1.0   # Full Run
+		else:
+			blend_pos = blend_pos.normalized() * 0.7   # Walk
+	else:
+		blend_pos = Vector2.ZERO   # Idle
+
+	animation_tree.set("parameters/BlendSpace2D/blend_position", blend_pos)
+
+	# ----- Jump / Fall / Crouch (Blend3) -----
+	var blend3 = 0.0
+
+	if not is_on_floor():
+		if velocity.y > 1.0:
+			blend3 = 1.0          # Jumping up
+		else:
+			blend3 = 0.6          # Falling (thoda soft)
+	elif Input.is_action_pressed("Crouch"):
+		blend3 = -1.0             # Crouch
+	else:
+		blend3 = 0.0              # Normal
+
+	# Smooth transition (bahut important)
+	var current_blend3 = animation_tree.get("parameters/Blend3/blend_amount")
+	animation_tree.set("parameters/Blend3/blend_amount", lerp(current_blend3, blend3, delta * 8.0))
 
 @rpc("any_peer", "call_local")
 func start_hold_object():
