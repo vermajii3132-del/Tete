@@ -1282,5 +1282,13 @@ offset_right = 546.0
 offset_bottom = 273.0
 text = "Tpp"
 
+[node name="Camera3D_TPP" type="Node3D" parent="." unique_id=26858032]
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Camera3D_TPP" unique_id=1388533221]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+spring_length = 4.0
+
+[node name="Camera3D" type="Camera3D" parent="Camera3D_TPP/SpringArm3D" unique_id=712028741]
+
 [connection signal="value_changed" from="CanvasLayer/Control/HSlider" to="." method="_on_h_slider_value_changed"]
 [connection signal="analogic_changed" from="CanvasLayer/Control/VirtualJoystickPlus" to="." method="_on_virtual_joystick_plus_analogic_changed"]
