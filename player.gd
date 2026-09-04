@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 var joystick_vector := Vector2.ZERO
 var touch_sensitivity : float = 0.2
-
+var mouseSensibility : float = 250.0   # ← ye naya line add karo (value badha/ghata sakte ho)
 @onready var animation_player = $Model/AnimationPlayer
 @onready var animation_tree = $AnimationTree
 @onready var model = $Model
@@ -77,6 +77,7 @@ func _ready():
 	Health = 100
 	Status = Globals.PlayerStatus.stable
 
+#	view_toggle_btn.text = "TPP"
 	if not is_multiplayer_authority() and Globals.GameMode != Globals.GameModes.practice: 
 		canvas_layer.hide()
 		return
@@ -91,7 +92,6 @@ func _ready():
 	# Default: TPP camera ON
 	camera_tpp.current = true
 	camera_fpp.current = false
-
 	# ===== VIEW TOGGLE BUTTON SIGNAL =====
 	if view_toggle_btn:
 		view_toggle_btn.pressed.connect(_on_view_toggle_pressed)

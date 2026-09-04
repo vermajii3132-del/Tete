@@ -1184,7 +1184,7 @@ spot_range = 15.8374
 spot_angle = 20.8301
 
 [node name="Camera3D_FPP" type="Camera3D" parent="Head" unique_id=768286062]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.37218475, 1.782)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2103126478]
 replication_config = SubResource("SceneReplicationConfig_icqpw")
@@ -1289,6 +1289,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 spring_length = 4.0
 
 [node name="Camera3D" type="Camera3D" parent="Camera3D_TPP/SpringArm3D" unique_id=712028741]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0610571, 0.9292896)
 
 [connection signal="value_changed" from="CanvasLayer/Control/HSlider" to="." method="_on_h_slider_value_changed"]
 [connection signal="analogic_changed" from="CanvasLayer/Control/VirtualJoystickPlus" to="." method="_on_virtual_joystick_plus_analogic_changed"]
