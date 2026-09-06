@@ -102,6 +102,16 @@ func _ready():
 	if view_toggle_btn:
 		view_toggle_btn.pressed.connect(_on_view_toggle_pressed)
 		view_toggle_btn.text = "TPP"
+		
+# AnimationTree force active karo
+	if animation_tree:
+		animation_tree.active = true
+		animation_tree.set("parameters/BlendSpace2D/blend_position", Vector2.ZERO)
+		animation_tree.set("parameters/Blend3/blend_amount", 0.0)
+
+	# Model show
+	model.show()
+	model.rotation.y = deg_to_rad(180)
 
 func _physics_process(delta):
 	if not is_multiplayer_authority() and Globals.GameMode != Globals.GameModes.practice: 
@@ -243,52 +253,52 @@ func hold_object():
 		if distance_from_player_and_object > 2:
 			drop_object.rpc()
 
+@rpc("any_peer", "call_local")
+
 func _update_animations(delta):
-	if not animation_tree:
+	if not animation_tree or not animation_tree.active:
 		return
 
-	# ----- Horizontal Movement -----
+	# Horizontal velocity
 	var horizontal_vel = Vector3(velocity.x, 0, velocity.z)
 	var speed = horizontal_vel.length()
 
 	var blend_pos = Vector2.ZERO
 
-	if speed > 0.15:
-		# Local direction nikalna (character ke hisaab se)
+	if speed > 0.2:
+		# Character ke local direction mein convert karo
 		var local_dir = global_transform.basis.inverse() * horizontal_vel.normalized()
-		
-		# Y = Forward/Back , X = Left/Right
-		blend_pos.x = local_dir.x
-		blend_pos.y = -local_dir.z   # Godot mein forward usually -Z hota hai
 
-		# Speed ke hisaab se intensity
-		if speed > WALK_SPEED + 0.5:
-			blend_pos = blend_pos.normalized() * 1.0   # Full Run
+		# BlendSpace mapping (tumhare points ke hisaab se)
+		# Y = Forward (+1 = Run Forward), X = Right (+1 = Walk Right)
+		blend_pos.x = clamp(local_dir.x, -1.0, 1.0)
+		blend_pos.y = clamp(-local_dir.z, -1.0, 1.0)
+
+		# Speed ke hisaab se thoda scale
+		if speed < WALK_SPEED * 0.7:
+			blend_pos *= 0.65   # Walk zone
 		else:
-			blend_pos = blend_pos.normalized() * 0.7   # Walk
+			blend_pos *= 1.0    # Run zone
 	else:
-		blend_pos = Vector2.ZERO   # Idle
+		blend_pos = Vector2.ZERO
 
-	animation_tree.set("parameters/BlendSpace2D/blend_position", blend_pos)
+	# Smoothly set karo
+	var current_pos = animation_tree.get("parameters/BlendSpace2D/blend_position")
+	animation_tree.set("parameters/BlendSpace2D/blend_position", current_pos.lerp(blend_pos, delta * 12.0))
 
-	# ----- Jump / Fall / Crouch (Blend3) -----
-	var blend3 = 0.0
+	# ----- Blend3 (Jump / Crouch) -----
+	var target_blend3 = 0.0
 
 	if not is_on_floor():
-		if velocity.y > 1.0:
-			blend3 = 1.0          # Jumping up
-		else:
-			blend3 = 0.6          # Falling (thoda soft)
+		target_blend3 = 1.0 if velocity.y > 0.8 else 0.5
 	elif Input.is_action_pressed("Crouch"):
-		blend3 = -1.0             # Crouch
+		target_blend3 = -1.0
 	else:
-		blend3 = 0.0              # Normal
+		target_blend3 = 0.0
 
-	# Smooth transition (bahut important)
 	var current_blend3 = animation_tree.get("parameters/Blend3/blend_amount")
-	animation_tree.set("parameters/Blend3/blend_amount", lerp(current_blend3, blend3, delta * 8.0))
+	animation_tree.set("parameters/Blend3/blend_amount", lerp(current_blend3, target_blend3, delta * 10.0))
 
-@rpc("any_peer", "call_local")
 func start_hold_object():
 	var collider = grabRay.get_collider()
 	if collider != null and collider is RigidBody3D or collider is PhysicalBone3D:

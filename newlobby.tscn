@@ -2,10 +2,13 @@
 
 [ext_resource type="PackedScene" uid="uid://mpcr7cs74l47" path="res://assets/players/player.tscn" id="1_djsbo"]
 [ext_resource type="Texture2D" uid="uid://okmyf3ot201s" path="res://image_38803b04.png" id="2_sriac"]
+[ext_resource type="Script" path="res://newlobby.gd" id="3_lobby"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hqkgv"]
-sky_top_color = Color(0.16719359, 0.4766242, 0.6690043, 1)
-sky_horizon_color = Color(0.6238562, 0.68561965, 0.48854458, 1)
+sky_top_color = Color(0.06, 0.08, 0.14, 1)
+sky_horizon_color = Color(0.2, 0.18, 0.14, 1)
+ground_bottom_color = Color(0.03, 0.03, 0.04, 1)
+ground_horizon_color = Color(0.1, 0.09, 0.08, 1)
 
 [sub_resource type="Sky" id="Sky_6qx4q"]
 sky_material = SubResource("ProceduralSkyMaterial_hqkgv")
@@ -13,6 +16,11 @@ sky_material = SubResource("ProceduralSkyMaterial_hqkgv")
 [sub_resource type="Environment" id="Environment_gyc6d"]
 background_mode = 2
 sky = SubResource("Sky_6qx4q")
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.3
+ssao_enabled = true
+ssil_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gyc6d"]
 cull_mode = 2
@@ -20,69 +28,1050 @@ shading_mode = 0
 albedo_texture = ExtResource("2_sriac")
 
 [sub_resource type="QuadMesh" id="QuadMesh_g7b7a"]
-size = Vector2(18, 16)
+size = Vector2(24, 14)
 
-[node name="newlobby" type="Node3D" unique_id=1025665046]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TopBar"]
+bg_color = Color(0.02, 0.02, 0.03, 0.94)
+border_width_bottom = 1
+border_color = Color(0.15, 0.15, 0.18, 1)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2002709060]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_AvatarFrame"]
+bg_color = Color(0.12, 0.12, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.4, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_RankBg"]
+bg_color = Color(0.08, 0.08, 0.1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_RankFill"]
+bg_color = Color(0.75, 0.6, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_CoinBg"]
+bg_color = Color(0.06, 0.06, 0.08, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.22, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Sidebar"]
+bg_color = Color(0.02, 0.02, 0.03, 0.9)
+border_width_right = 1
+border_color = Color(0.15, 0.15, 0.18, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_SidebarBtn"]
+bg_color = Color(0.05, 0.05, 0.06, 0.95)
+border_width_left = 3
+border_color = Color(0.25, 0.25, 0.28, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_SidebarBtnHover"]
+bg_color = Color(0.1, 0.1, 0.13, 1)
+border_width_left = 3
+border_color = Color(0.65, 0.55, 0.25, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_FriendsPanel"]
+bg_color = Color(0.02, 0.02, 0.03, 0.94)
+border_width_left = 1
+border_color = Color(0.15, 0.15, 0.18, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_FriendCard"]
+bg_color = Color(0.05, 0.05, 0.06, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.15, 0.15, 0.18, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_OnlineDot"]
+bg_color = Color(0.25, 0.85, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_OfflineDot"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BottomBar"]
+bg_color = Color(0.015, 0.015, 0.02, 0.96)
+border_width_top = 1
+border_color = Color(0.15, 0.15, 0.18, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BottomBtn"]
+bg_color = Color(0.04, 0.04, 0.05, 0.92)
+border_width_top = 2
+border_color = Color(0.2, 0.2, 0.22, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BottomBtnHover"]
+bg_color = Color(0.1, 0.1, 0.12, 1)
+border_width_top = 2
+border_color = Color(0.6, 0.5, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_DeployCard"]
+bg_color = Color(0.03, 0.03, 0.04, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.25, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_MapThumb"]
+bg_color = Color(0.08, 0.2, 0.12, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ModeBtn"]
+bg_color = Color(0.05, 0.05, 0.06, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.22, 0.5)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ModeBtnActive"]
+bg_color = Color(0.18, 0.16, 0.1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.75, 0.65, 0.25, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Start"]
+bg_color = Color(0.88, 0.72, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.88, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_StartHover"]
+bg_color = Color(1, 0.82, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.5, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ChatBox"]
+bg_color = Color(0.02, 0.02, 0.03, 0.88)
+border_width_top = 1
+border_color = Color(0.15, 0.15, 0.18, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ToggleBtn"]
+bg_color = Color(0.06, 0.06, 0.08, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.22, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_TppLabel"]
+bg_color = Color(0.06, 0.06, 0.08, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.25, 0.28, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="newlobby" type="Node3D"]
+script = ExtResource("3_lobby")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_gyc6d")
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1556521451]
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 1.8, 3.2)
 
-[node name="Node3D" type="Node3D" parent="." unique_id=1475247224]
+[node name="Node3D" type="Node3D" parent="."]
 
-[node name="Player" parent="Node3D" unique_id=1662430914 instance=ExtResource("1_djsbo")]
-transform = Transform3D(-2, 0, -1.7484555e-07, 0, 2, 0, 1.7484555e-07, 0, -2, 0, 0.0418061, -3.311626)
+[node name="Player" parent="Node3D" instance=ExtResource("1_djsbo")]
+transform = Transform3D(-2, 0, -1.74846e-07, 0, 2, 0, 1.74846e-07, 0, -2, 0, 0, 0)
 
-[node name="GeneralSkeleton" parent="Node3D/Player/Model/Armature" parent_id_path=PackedInt32Array(1662430914, 1349420275) index="0" unique_id=2076909921]
-bones/0/position = Vector3(-0.0035622255, 0.99215925, 0.035039667)
-bones/0/rotation = Quaternion(-0.035292324, -0.044328693, -0.025299609, 0.99807286)
-bones/1/rotation = Quaternion(0.024987608, 0.014728501, 0.025548302, 0.99925274)
-bones/2/rotation = Quaternion(0.009242585, 0.003717558, 0.01426959, 0.99984854)
-bones/3/rotation = Quaternion(0.008605977, 0.0038325507, 0.014283363, 0.9998537)
-bones/4/rotation = Quaternion(0.045363706, -0.0019643956, 0.0054766107, 0.99895364)
-bones/5/rotation = Quaternion(-0.06503897, 0.010892586, -0.0024499085, 0.99782026)
-bones/7/rotation = Quaternion(0.47720194, -0.478441, -0.6331254, -0.37752452)
-bones/8/rotation = Quaternion(-0.15167455, 0.8282846, -0.4943674, 0.21573196)
-bones/9/rotation = Quaternion(0.040591296, 0.70594084, -0.040591326, 0.7059406)
-bones/10/rotation = Quaternion(0.041758966, -0.57204056, 0.035865396, 0.8183761)
-bones/31/rotation = Quaternion(0.45848408, 0.5002344, 0.6272577, -0.38223755)
-bones/32/rotation = Quaternion(0.12365253, 0.79772604, -0.57653075, -0.12631516)
-bones/33/rotation = Quaternion(0.009680188, -0.70704067, 0.009680215, 0.7070404)
-bones/34/rotation = Quaternion(0.055361174, 0.48224914, -0.021113375, 0.87402815)
-bones/55/rotation = Quaternion(-0.09365785, -0.010595726, 0.9952382, -0.024838518)
-bones/56/rotation = Quaternion(0.03416694, 0.99369377, -0.06713996, -0.08305198)
-bones/57/rotation = Quaternion(0.01057534, 0.6795207, -0.73299104, -0.029389624)
-bones/58/rotation = Quaternion(-2.8234941e-08, 0.9981734, 0.060415145, 2.3054703e-09)
-bones/60/rotation = Quaternion(0.13501628, 0.06755977, 0.9858777, -0.072468445)
-bones/61/rotation = Quaternion(-0.0386403, 0.9946155, -0.0952671, 0.013085266)
-bones/62/rotation = Quaternion(-0.04145562, 0.7159022, -0.69525355, 0.04886708)
-
-[node name="JumpButton" parent="Node3D/Player/CanvasLayer/Control" parent_id_path=PackedInt32Array(1662430914, 2109077509) index="0" unique_id=2043981977]
-position = Vector2(2854, -133.99994)
-
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2077557319]
-
-[node name="Control" type="Control" parent="CanvasLayer" unique_id=2044868596]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Control" type="Control" parent="." unique_id=1063523584]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=897786174]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, -50, 0)
-light_energy = 2.6
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 5, 8, 5)
+light_energy = 1.5
 shadow_enabled = true
+shadow_bias = 0.05
 
-[node name="background" type="MeshInstance3D" parent="." unique_id=1788495331]
-transform = Transform3D(1.4, 0, 0, 0, 1.2, 0, 0, 0, 1, 0.417881, -3.403454, -7.8851337)
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 1.5)
+light_energy = 2.5
+light_color = Color(1, 0.92, 0.8, 1)
+omni_range = 8.0
+
+[node name="background" type="MeshInstance3D" parent="."]
+transform = Transform3D(2.4, 0, 0, 0, 1.6, 0, 0, 0, 1, 0, 1.2, -8)
 material_override = SubResource("StandardMaterial3D_gyc6d")
 mesh = SubResource("QuadMesh_g7b7a")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" type="PanelContainer" parent="CanvasLayer/MainUI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_TopBar")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ProfilePanel" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Avatar" type="PanelContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/ProfilePanel"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_AvatarFrame")
+
+[node name="ShieldIcon" type="ColorRect" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/ProfilePanel/Avatar"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+color = Color(0.3, 0.35, 0.45, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/ProfilePanel"]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerName" type="Label" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/ProfilePanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "COMMANDER_ONE"
+
+[node name="RankBar" type="ProgressBar" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/ProfilePanel/VBoxContainer"]
+custom_minimum_size = Vector2(110, 5)
+layout_mode = 2
+value = 65.0
+theme_override_styles/background = SubResource("StyleBoxFlat_RankBg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_RankFill")
+
+[node name="RankLabel" type="Label" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/ProfilePanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "RANK 52"
+
+[node name="Spacer" type="Control" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CurrencyPanel" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Credits" type="PanelContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_CoinBg")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Credits"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Credits/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="ColorRect" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Credits/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+color = Color(1, 0.75, 0.12, 1)
+
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Credits/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "342233"
+
+[node name="Gems" type="PanelContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_CoinBg")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Gems"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Gems/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="ColorRect" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Gems/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+color = Color(0.15, 0.55, 1, 1)
+
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Gems/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "10570"
+
+[node name="Chips" type="PanelContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_CoinBg")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Chips"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Chips/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="ColorRect" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Chips/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+color = Color(0.75, 0.15, 1, 1)
+
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Chips/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "15"
+
+[node name="Resources" type="PanelContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_CoinBg")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Resources"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Resources/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="ColorRect" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Resources/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+color = Color(0.15, 0.75, 0.25, 1)
+
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/CurrencyPanel/Resources/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "5"
+
+[node name="TopRightBtns" type="HBoxContainer" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MailBtn" type="Button" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/TopRightBtns"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ToggleBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+text = "M"
+
+[node name="SettingsBtn" type="Button" parent="CanvasLayer/MainUI/TopBar/MarginContainer/HBoxContainer/TopRightBtns"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ToggleBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+text = "S"
+
+[node name="LeftSidebar" type="PanelContainer" parent="CanvasLayer/MainUI"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 64.0
+offset_right = 84.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Sidebar")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/LeftSidebar"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/LeftSidebar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MissionsBtn" type="Button" parent="CanvasLayer/MainUI/LeftSidebar/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(68, 72)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_SidebarBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "MIS"
+
+[node name="SeasonBtn" type="Button" parent="CanvasLayer/MainUI/LeftSidebar/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(68, 72)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_SidebarBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "SEA"
+
+[node name="ClanBtn" type="Button" parent="CanvasLayer/MainUI/LeftSidebar/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(68, 72)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_SidebarBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "CLA"
+
+[node name="SkillBtn" type="Button" parent="CanvasLayer/MainUI/LeftSidebar/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(68, 72)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_SidebarBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "SKI"
+
+[node name="FriendsToggle" type="Button" parent="CanvasLayer/MainUI/LeftSidebar/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(68, 36)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ToggleBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+theme_override_font_sizes/font_size = 10
+text = "FRIENDS"
+
+[node name="RightSidebar" type="PanelContainer" parent="CanvasLayer/MainUI"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = 64.0
+offset_bottom = -74.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_FriendsPanel")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/RightSidebar"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="FriendsTitle" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "FRIENDS"
+
+[node name="CloseFriends" type="Button" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/Header"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ToggleBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+text = "X"
+
+[node name="OnlineLabel" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.35, 0.85, 0.35, 1)
+text = "ONLINE (4)"
+
+[node name="OnlineList" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Friend1" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_FriendCard")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Avatar" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "AlphaWarrior"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RankIcon" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+color = Color(0.9, 0.7, 0.2, 1)
+
+[node name="Rank" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Ace"
+
+[node name="OnlineDot" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend1/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_OnlineDot")
+
+[node name="Friend2" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_FriendCard")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Avatar" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "SniperKing"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RankIcon" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+color = Color(0.9, 0.7, 0.2, 1)
+
+[node name="Rank" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Diamond II"
+
+[node name="OnlineDot" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend2/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_OnlineDot")
+
+[node name="Friend3" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_FriendCard")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Avatar" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "GhostRider"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RankIcon" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+color = Color(0.9, 0.7, 0.2, 1)
+
+[node name="Rank" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Crown V"
+
+[node name="OnlineDot" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend3/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_OnlineDot")
+
+[node name="Friend4" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_FriendCard")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Avatar" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "NovaStrike"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RankIcon" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+color = Color(0.9, 0.7, 0.2, 1)
+
+[node name="Rank" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Platinum I"
+
+[node name="OnlineDot" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OnlineList/Friend4/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_OnlineDot")
+
+[node name="OfflineLabel" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "OFFLINE (5)"
+
+[node name="OfflineList" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Friend5" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_FriendCard")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Avatar" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "ShadowNinja"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RankIcon" type="ColorRect" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="Rank" type="Label" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "Diamond IV"
+
+[node name="OfflineDot" type="PanelContainer" parent="CanvasLayer/MainUI/RightSidebar/MarginContainer/VBoxContainer/OfflineList/Friend5/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(8, 8)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_OfflineDot")
+
+[node name="BottomBar" type="PanelContainer" parent="CanvasLayer/MainUI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -68.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_BottomBar")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/BottomBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_right = 270
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/BottomBar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="TroopBtn" type="Button" parent="CanvasLayer/MainUI/BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(95, 52)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_BottomBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BottomBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "TROOP"
+
+[node name="GarageBtn" type="Button" parent="CanvasLayer/MainUI/BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(95, 52)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_BottomBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BottomBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "GARAGE"
+
+[node name="SocialBtn" type="Button" parent="CanvasLayer/MainUI/BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(95, 52)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_BottomBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BottomBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "SOCIAL"
+
+[node name="ArmoryBtn" type="Button" parent="CanvasLayer/MainUI/BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(95, 52)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_BottomBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BottomBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "ARMORY"
+
+[node name="SkillsBtn" type="Button" parent="CanvasLayer/MainUI/BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(95, 52)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_BottomBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BottomBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "SKILLS"
+
+[node name="MarketBtn" type="Button" parent="CanvasLayer/MainUI/BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(95, 52)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_BottomBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_BottomBtnHover")
+theme_override_font_sizes/font_size = 11
+text = "MARKET"
+
+[node name="BottomRight" type="Control" parent="CanvasLayer/MainUI"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -230.0
+offset_right = -16.0
+offset_bottom = -74.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="DeployPanel" type="PanelContainer" parent="CanvasLayer/MainUI/BottomRight"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_DeployCard")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/BottomRight/DeployPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/BottomRight/DeployPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MapThumb" type="ColorRect" parent="CanvasLayer/MainUI/BottomRight/DeployPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 55)
+layout_mode = 2
+color = Color(0.08, 0.22, 0.14, 1)
+
+[node name="MapName" type="Label" parent="CanvasLayer/MainUI/BottomRight/DeployPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "DEPLOYMENT ZONE"
+horizontal_alignment = 1
+
+[node name="MapMode" type="Label" parent="CanvasLayer/MainUI/BottomRight/DeployPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.55, 0.55, 0.55, 1)
+text = "100-Player TPP"
+horizontal_alignment = 1
+
+[node name="ModeSelector" type="HBoxContainer" parent="CanvasLayer/MainUI/BottomRight"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+offset_bottom = -62.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="SoloBtn" type="Button" parent="CanvasLayer/MainUI/BottomRight/ModeSelector"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeBtnActive")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeBtnActive")
+theme_override_font_sizes/font_size = 11
+text = "SOLO"
+
+[node name="DuoBtn" type="Button" parent="CanvasLayer/MainUI/BottomRight/ModeSelector"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeBtnActive")
+theme_override_font_sizes/font_size = 11
+text = "DUO"
+
+[node name="SquadBtn" type="Button" parent="CanvasLayer/MainUI/BottomRight/ModeSelector"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeBtnActive")
+theme_override_font_sizes/font_size = 11
+text = "SQUAD"
+
+[node name="TppLabel" type="PanelContainer" parent="CanvasLayer/MainUI/BottomRight"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -56.0
+offset_right = 70.0
+offset_bottom = -26.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_TppLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/BottomRight/TppLabel"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/BottomRight/TppLabel/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "TPP SOLO"
+
+[node name="StartBtn" type="Button" parent="CanvasLayer/MainUI/BottomRight"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -56.0
+offset_left = 76.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_Start")
+theme_override_styles/hover = SubResource("StyleBoxFlat_StartHover")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.08, 0.06, 0.01, 1)
+text = "START"
+
+[node name="BottomLeft" type="PanelContainer" parent="CanvasLayer/MainUI"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 94.0
+offset_top = -140.0
+offset_right = 410.0
+offset_bottom = -74.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ChatBox")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainUI/BottomLeft"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/BottomLeft/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TeamBtn" type="Button" parent="CanvasLayer/MainUI/BottomLeft/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ToggleBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_SidebarBtnHover")
+theme_override_font_sizes/font_size = 10
+text = "Team"
+
+[node name="ChatText" type="RichTextLabel" parent="CanvasLayer/MainUI/BottomLeft/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 11
+text = "[ALL-CHAT] Phantom: Team recruit!
+[CLAN] Stark: Group up!
+[VIP] Nova: GG!"
 
 [editable path="Node3D/Player"]
